@@ -3,7 +3,7 @@ export type ThreatLevel = 'critical' | 'high' | 'medium' | 'low' | 'info';
 export type EventCategory =
   | 'conflict' | 'protest' | 'disaster' | 'diplomatic' | 'economic'
   | 'terrorism' | 'cyber' | 'health' | 'environmental' | 'military'
-  | 'crime' | 'infrastructure' | 'global situation' | 'general';
+  | 'crime' | 'infrastructure' | 'tech' | 'general';
 
 export interface ThreatClassification {
   level: ThreatLevel;
@@ -172,73 +172,7 @@ const HIGH_KEYWORDS: KeywordMap = {
   'forces struck': 'conflict',
 };
 
-const MEDIUM_KEYWORDS: KeywordMap = {
-  'protest': 'protest',
-  'protests': 'protest',
-  'riot': 'protest',
-  'riots': 'protest',
-  'unrest': 'protest',
-  'demonstration': 'protest',
-  'strike action': 'protest',
-  'military exercise': 'military',
-  'naval exercise': 'military',
-  'arms deal': 'military',
-  'weapons sale': 'military',
-  'diplomatic crisis': 'diplomatic',
-  'ambassador recalled': 'diplomatic',
-  'expel diplomats': 'diplomatic',
-  'trade war': 'economic',
-  'tariff': 'economic',
-  'recession': 'economic',
-  'inflation': 'economic',
-  'market crash': 'economic',
-  'flood': 'disaster',
-  'flooding': 'disaster',
-  'wildfire': 'disaster',
-  'volcano': 'disaster',
-  'eruption': 'disaster',
-  'outbreak': 'health',
-  'epidemic': 'health',
-  'infection spread': 'health',
-  'oil spill': 'environmental',
-  'pipeline explosion': 'infrastructure',
-  'blackout': 'infrastructure',
-  'power outage': 'infrastructure',
-  'internet outage': 'infrastructure',
-  'derailment': 'infrastructure',
-};
-
-const LOW_KEYWORDS: KeywordMap = {
-  'election': 'diplomatic',
-  'vote': 'diplomatic',
-  'referendum': 'diplomatic',
-  'summit': 'diplomatic',
-  'treaty': 'diplomatic',
-  'agreement': 'diplomatic',
-  'negotiation': 'diplomatic',
-  'talks': 'diplomatic',
-  'peacekeeping': 'diplomatic',
-  'humanitarian aid': 'diplomatic',
-  'ceasefire': 'diplomatic',
-  'peace treaty': 'diplomatic',
-  'climate change': 'environmental',
-  'emissions': 'environmental',
-  'pollution': 'environmental',
-  'deforestation': 'environmental',
-  'drought': 'environmental',
-  'vaccine': 'health',
-  'vaccination': 'health',
-  'disease': 'health',
-  'virus': 'health',
-  'public health': 'health',
-  'covid': 'health',
-  'interest rate': 'economic',
-  'gdp': 'economic',
-  'unemployment': 'economic',
-  'regulation': 'economic',
-};
-
-const GLOBAL_SITUATION_HIGH_KEYWORDS: KeywordMap = {
+const TECH_HIGH_KEYWORDS: KeywordMap = {
   'major outage': 'infrastructure',
   'service down': 'infrastructure',
   'global outage': 'infrastructure',
@@ -248,7 +182,7 @@ const GLOBAL_SITUATION_HIGH_KEYWORDS: KeywordMap = {
   'mass layoff': 'economic',
 };
 
-const GLOBAL_SITUATION_MEDIUM_KEYWORDS: KeywordMap = {
+const TECH_MEDIUM_KEYWORDS: KeywordMap = {
   'outage': 'infrastructure',
   'breach': 'cyber',
   'hack': 'cyber',
@@ -261,17 +195,18 @@ const GLOBAL_SITUATION_MEDIUM_KEYWORDS: KeywordMap = {
   'shutdown': 'infrastructure',
 };
 
-const GLOBAL_SITUATION_LOW_KEYWORDS: KeywordMap = {
+const TECH_LOW_KEYWORDS: KeywordMap = {
   'ipo': 'economic',
   'funding': 'economic',
   'acquisition': 'economic',
   'merger': 'economic',
-  'launch': 'global situation',
-  'release': 'global situation',
-  'update': 'global situation',
-  'startup': 'global situation',
-  'ai model': 'global situation',
-  'open source': 'global situation',
+  'launch': 'tech',
+  'release': 'tech',
+  'update': 'tech',
+  'partnership': 'economic',
+  'startup': 'tech',
+  'ai model': 'tech',
+  'open source': 'tech',
 };
 
 const EXCLUSIONS = [
@@ -343,7 +278,6 @@ export function classifyByKeyword(title: string, variant = 'full'): ThreatClassi
   }
 
   const isTech = variant === 'tech';
-  const isGlobalSituation = variant === 'global situation';
 
   // Priority cascade: critical → high → medium → low → info
   let match = matchKeywords(lower, CRITICAL_KEYWORDS);
@@ -359,16 +293,15 @@ export function classifyByKeyword(title: string, variant = 'full'): ThreatClassi
   }
 
   if (isTech) {
-    match = matchKeywords(lower, GLOBAL_SITUATION_HIGH_KEYWORDS);
+    match = matchKeywords(lower, TECH_HIGH_KEYWORDS);
+    if (match) return { level: 'high', category: match.category, confidence: 0.75, source: 'keyword' };
   }
 
-  if (isGlobalSituation) {
-    match = matchKeywords(lower, GLOBAL_SITUATION_MEDIUM_KEYWORDS);
-  }
+  match = matchKeywords(lower, TECH_MEDIUM_KEYWORDS);
+  if (match) return { level: 'medium', category: match.category, confidence: 0.65, source: 'keyword' };
 
-  if (isGlobalSituation) {
-    match = matchKeywords(lower, GLOBAL_SITUATION_LOW_KEYWORDS);
-  }
+  match = matchKeywords(lower, TECH_LOW_KEYWORDS);
+  if (match) return { level: 'low', category: match.category, confidence: 0.55, source: 'keyword' };
 
   return { level: 'info', category: 'general', confidence: 0.3, source: 'keyword' };
 }

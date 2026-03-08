@@ -11,8 +11,6 @@ const DEFCON_COLORS: Record<number, string> = {
 };
 
 export class PizzIntIndicator {
-  private element: HTMLElement;
-  private isExpanded = false;
   private status: PizzIntStatus | null = null;
   private tensions: GdeltTensionPair[] = [];
 
@@ -22,7 +20,7 @@ export class PizzIntIndicator {
         h('span', { className: 'pizzint-title' }, t('components.pizzint.title')),
         h('button', {
           className: 'pizzint-close',
-          onClick: () => { this.isExpanded = false; panel.classList.add('hidden'); },
+          onClick: () => { panel.classList.add('hidden'); },
         }, '×'),
       ),
       h('div', { className: 'pizzint-status-bar' },
