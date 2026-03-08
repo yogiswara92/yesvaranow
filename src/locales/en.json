@@ -947,12 +947,7 @@
       "base": "Base",
       "nuclear": "Nuclear"
     },
-    "community": {
-      "joinDiscussion": "Join the Discussion",
-      "openDiscussion": "Open Discussion",
-      "dontShowAgain": "Don't show again",
-      "sectionLabel": "Community"
-    },
+   
     "threatLabels": {
       "critical": "CRIT",
       "high": "HIGH",

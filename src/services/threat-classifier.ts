@@ -3,7 +3,7 @@ export type ThreatLevel = 'critical' | 'high' | 'medium' | 'low' | 'info';
 export type EventCategory =
   | 'conflict' | 'protest' | 'disaster' | 'diplomatic' | 'economic'
   | 'terrorism' | 'cyber' | 'health' | 'environmental' | 'military'
-  | 'crime' | 'infrastructure' | 'tech' | 'general';
+  | 'crime' | 'infrastructure' | 'global situation' | 'general';
 
 export interface ThreatClassification {
   level: ThreatLevel;
@@ -238,7 +238,7 @@ const LOW_KEYWORDS: KeywordMap = {
   'regulation': 'economic',
 };
 
-const TECH_HIGH_KEYWORDS: KeywordMap = {
+const GLOBAL_SITUATION_HIGH_KEYWORDS: KeywordMap = {
   'major outage': 'infrastructure',
   'service down': 'infrastructure',
   'global outage': 'infrastructure',
@@ -248,7 +248,7 @@ const TECH_HIGH_KEYWORDS: KeywordMap = {
   'mass layoff': 'economic',
 };
 
-const TECH_MEDIUM_KEYWORDS: KeywordMap = {
+const GLOBAL_SITUATION_MEDIUM_KEYWORDS: KeywordMap = {
   'outage': 'infrastructure',
   'breach': 'cyber',
   'hack': 'cyber',
@@ -261,18 +261,17 @@ const TECH_MEDIUM_KEYWORDS: KeywordMap = {
   'shutdown': 'infrastructure',
 };
 
-const TECH_LOW_KEYWORDS: KeywordMap = {
+const GLOBAL_SITUATION_LOW_KEYWORDS: KeywordMap = {
   'ipo': 'economic',
   'funding': 'economic',
   'acquisition': 'economic',
   'merger': 'economic',
-  'launch': 'tech',
-  'release': 'tech',
-  'update': 'tech',
-  'partnership': 'economic',
-  'startup': 'tech',
-  'ai model': 'tech',
-  'open source': 'tech',
+  'launch': 'global situation',
+  'release': 'global situation',
+  'update': 'global situation',
+  'startup': 'global situation',
+  'ai model': 'global situation',
+  'open source': 'global situation',
 };
 
 const EXCLUSIONS = [
@@ -344,6 +343,7 @@ export function classifyByKeyword(title: string, variant = 'full'): ThreatClassi
   }
 
   const isTech = variant === 'tech';
+  const isGlobalSituation = variant === 'global situation';
 
   // Priority cascade: critical → high → medium → low → info
   let match = matchKeywords(lower, CRITICAL_KEYWORDS);
@@ -359,24 +359,15 @@ export function classifyByKeyword(title: string, variant = 'full'): ThreatClassi
   }
 
   if (isTech) {
-    match = matchKeywords(lower, TECH_HIGH_KEYWORDS);
-    if (match) return { level: 'high', category: match.category, confidence: 0.75, source: 'keyword' };
+    match = matchKeywords(lower, GLOBAL_SITUATION_HIGH_KEYWORDS);
   }
 
-  match = matchKeywords(lower, MEDIUM_KEYWORDS);
-  if (match) return { level: 'medium', category: match.category, confidence: 0.7, source: 'keyword' };
-
-  if (isTech) {
-    match = matchKeywords(lower, TECH_MEDIUM_KEYWORDS);
-    if (match) return { level: 'medium', category: match.category, confidence: 0.65, source: 'keyword' };
+  if (isGlobalSituation) {
+    match = matchKeywords(lower, GLOBAL_SITUATION_MEDIUM_KEYWORDS);
   }
 
-  match = matchKeywords(lower, LOW_KEYWORDS);
-  if (match) return { level: 'low', category: match.category, confidence: 0.6, source: 'keyword' };
-
-  if (isTech) {
-    match = matchKeywords(lower, TECH_LOW_KEYWORDS);
-    if (match) return { level: 'low', category: match.category, confidence: 0.55, source: 'keyword' };
+  if (isGlobalSituation) {
+    match = matchKeywords(lower, GLOBAL_SITUATION_LOW_KEYWORDS);
   }
 
   return { level: 'info', category: 'general', confidence: 0.3, source: 'keyword' };

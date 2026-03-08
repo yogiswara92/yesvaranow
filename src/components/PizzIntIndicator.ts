@@ -42,19 +42,7 @@ export class PizzIntIndicator {
       ),
     );
 
-    this.element = h('div', { className: 'pizzint-indicator' },
-      h('button', {
-        className: 'pizzint-toggle',
-        title: t('components.pizzint.title'),
-        onClick: () => { this.isExpanded = !this.isExpanded; panel.classList.toggle('hidden', !this.isExpanded); },
-      },
-        h('span', { className: 'pizzint-icon' }, '🍕'),
-        h('span', { className: 'pizzint-defcon' }, '--'),
-        h('span', { className: 'pizzint-score' }, '--%'),
-      ),
-      panel,
-    );
-
+    this.element = null;
   }
 
   public updateStatus(status: PizzIntStatus): void {

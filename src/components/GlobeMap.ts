@@ -1141,7 +1141,7 @@ export class GlobeMap {
       </div>`;
     const authorBadge = document.createElement('div');
     authorBadge.className = 'map-author-badge';
-    authorBadge.textContent = '© Elie Habib · Someone™';
+    authorBadge.textContent = '©Yesvara';
     el.appendChild(authorBadge);
     this.container.appendChild(el);
 
