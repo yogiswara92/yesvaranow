@@ -13,14 +13,15 @@ const DEFCON_COLORS: Record<number, string> = {
 export class PizzIntIndicator {
   private status: PizzIntStatus | null = null;
   private tensions: GdeltTensionPair[] = [];
+  private element: HTMLElement;
 
   constructor() {
-    const panel = h('div', { className: 'pizzint-panel hidden' },
+    this.element = h('div', { className: 'pizzint-panel hidden' },
       h('div', { className: 'pizzint-header' },
         h('span', { className: 'pizzint-title' }, t('components.pizzint.title')),
         h('button', {
           className: 'pizzint-close',
-          onClick: () => { panel.classList.add('hidden'); },
+          onClick: () => { this.element.classList.add('hidden'); },
         }, '×'),
       ),
       h('div', { className: 'pizzint-status-bar' },
@@ -39,8 +40,6 @@ export class PizzIntIndicator {
         h('span', { className: 'pizzint-updated' }),
       ),
     );
-
-    this.element = null;
   }
 
   public updateStatus(status: PizzIntStatus): void {
